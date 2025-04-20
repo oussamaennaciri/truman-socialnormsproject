@@ -18,7 +18,8 @@
             |  Unflag
     .img.post.image
       img(src='/public/picture.svg', data-src=cdn+"/post_pictures/"+val.picture, style="max-width:100%; width:100%;")
-    .description=val.body
+    .description
+      != val.body
     .myTimer.hidden 0
   .ui.bottom.three.attached.icon.buttons
     .ui.reply.button(tabindex='0')

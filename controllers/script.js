@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+const linkify = require('../helpers/linkify');
 const Script = require('../models/Script.js');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
@@ -60,6 +62,9 @@ exports.getScript = async(req, res, next) => {
 
         // Get the newsfeed and render it.
         const finalfeed = helpers.getFeed(user_posts, script_feed, user, process.env.FEED_ORDER, (process.env.REMOVE_FLAGGED_CONTENT == 'TRUE'), true);
+        finalfeed.forEach(post => {
+            post.body = linkify(post.body, post._id);
+          });
         console.log("Script Size is now: " + finalfeed.length);
         res.render('script', { script: finalfeed, showNewPostIcon: true });
     } catch (err) {
@@ -134,6 +139,7 @@ exports.newPost = async(req, res) => {
  */
 exports.postUpdateFeedAction = async(req, res, next) => {
     try {
+        console.log("🎯 FEED ACTION RECEIVED:", req.body);
         const user = await User.findById(req.user.id).exec();
         // Check if user has interacted with the post before.
         let feedIndex = _.findIndex(user.feedAction, function(o) { return o.post == req.body.postID; });
@@ -325,3 +331,32 @@ exports.postUpdateUserPostFeedAction = async(req, res, next) => {
         next(err);
     }
 }
+/**
+ * POST /track-link
+ * Record when a user clicks a link inside a post.
+ */
+exports.trackLinkClick = async (req, res, next) => {
+    console.log("🔗 Tracking Link Click:", req.body);
+    try {
+      const { postID, url } = req.body;
+      const user = await User.findById(req.user.id).exec();
+  
+      if (!postID || !url) {
+        return res.status(400).json({ error: 'Missing postID or url' });
+      }
+  
+      // ✅ Convert postID to ObjectId so it matches schema
+      user.linkClicks.push({
+        postID: mongoose.Types.ObjectId(postID),
+        url
+      });
+  
+      user.markModified('linkClicks'); // 👈 Ensures change is tracked by Mongoose
+      await user.save();
+  
+      res.status(200).json({ success: true });
+    } catch (err) {
+      next(err);
+    }
+  };
+  

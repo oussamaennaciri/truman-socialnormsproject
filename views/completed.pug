@@ -22,3 +22,23 @@ block content
             td=Math.round(u.pageTimes.reduce((partialSum, a) => partialSum + a, 0)/1000/60)+" minutes"
             td=u.numPosts + 1
             td=u.numComments + 1
+          if u.linkClicks && u.linkClicks.length
+            tr
+              td(colspan="7")
+                h4 Link Clicks
+                table.ui.compact.table
+                  thead
+                    tr
+                      th Timestamp
+                      th URL
+                      th Post ID
+                  tbody
+                    each click in u.linkClicks
+                      tr
+                        td= new Date(click.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" })
+                        td 
+                          a(href=click.url, target="_blank")= click.url
+                        td= click.postID
+          else
+            tr
+              td(colspan="7") i No link clicks recorded

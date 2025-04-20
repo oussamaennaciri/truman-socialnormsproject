@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema({
     blocked: [String], // List of usernames of actors user has blocked
     reported: [String], // List of usernames of actors user has reported
     followed: [String], // List of usernames of actors user has followed
+    linkClicks: [new Schema({
+        postID: { type: Schema.Types.ObjectId, ref: 'Script' },
+        url: String,
+        timestamp: { type: Date, default: Date.now }
+      }, { _id: true, versionKey: false })],
     blockReportAndFollowLog: [new Schema({
         time: Date, // Absolute Time of action
         action: String, // Action taken. Values include: 'block', 'unblock', 'follow', 'unfollow', 'report'

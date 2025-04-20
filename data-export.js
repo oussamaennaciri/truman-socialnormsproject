@@ -38,6 +38,7 @@ async function getUserJsons() {
 
 async function getDataExport() {
     const users = await getUserJsons();
+    const script_posts = await Script.find({}, '_id postID').exec();
     console.log(color_start, `Starting the data export script...`);
     const currentDate = new Date();
     const outputFilename =
@@ -65,7 +66,8 @@ async function getDataExport() {
         { id: 'ActorsReported', title: 'ActorsReported' },
         { id: 'ActorsFollowed', title: 'ActorsFollowed' },
         { id: 'TimeOnSite', title: 'TimeOnSite' },
-        { id: 'PageLog', title: 'PageLog' }
+        { id: 'PageLog', title: 'PageLog' },
+        { id: 'LinkClicks', title: 'LinkClicks' }
     ];
     const csvWriter = createCsvWriter({
         path: outputFilepath,
@@ -100,7 +102,7 @@ async function getDataExport() {
 
         //For each post (feedAction)
         for (const feedAction of user.feedAction) {
-            if (user.feedAction.post == null) {
+            if (feedAction.post == null) {
                 continue;
             }
             if (feedAction.liked) {
@@ -161,6 +163,17 @@ async function getDataExport() {
 
         record.TimeOnSite = user.pageTimes.reduce((sum, time) => sum + time);
         record.PageLog = user.pageLog.map(pageLog => pageLog.page);
+        if (user.linkClicks && user.linkClicks.length) {
+            record.LinkClicks = user.linkClicks.map(click => {
+              const time = new Date(click.timestamp).toLocaleString("en-US", { timeZone: "America/New_York" });
+              const matched = script_posts.find(p => p._id.equals(click.postID));
+              const postNum = matched ? matched.postID : 'Unknown';
+              return `${time}, ${click.url}, on Post ${postNum}`;
+            }).join("\r\n");
+          } else {
+            record.LinkClicks = "";
+          }          
+          
 
         console.log(record);
         records.push(record);

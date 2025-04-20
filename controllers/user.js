@@ -361,7 +361,12 @@ exports.userTestResults = async(req, res) => {
                     await user.save();
                 }
             }
-            res.render('completed', { users: users });
+            res.render('completed', {
+                users: users.map(user => ({
+                  ...user.toObject(),
+                  linkClicks: user.linkClicks || []
+                }))
+              });              
         } catch (err) {
             next(err);
         }

@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@node-rs/bcrypt": "^1.7.3",
-        "async": "^3.2.4",
+        "async": "^3.2.6",
         "body-parser": "^1.20.2",
         "compression": "^1.7.4",
         "connect-mongo": "^5.0.0",

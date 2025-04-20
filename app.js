@@ -240,6 +240,7 @@ app.get('/actors', passportConfig.isAuthenticated, actorsController.getActors)
 app.get('/feed', passportConfig.isAuthenticated, scriptController.getScript);
 app.post('/feed', passportConfig.isAuthenticated, scriptController.postUpdateFeedAction);
 app.post('/userPost_feed', passportConfig.isAuthenticated, scriptController.postUpdateUserPostFeedAction);
+app.post('/track-link', passportConfig.isAuthenticated, scriptController.trackLinkClick);
 app.get('/test', passportConfig.isAuthenticated, function(req, res) {
     res.render('test', {
         title: 'Test'

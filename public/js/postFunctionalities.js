@@ -413,3 +413,20 @@ $(window).on('load', () => {
         }
     });
 });
+$(document).on('click', 'a.tracked-link', function (e) {
+    e.preventDefault(); // Stop default behavior until we finish tracking
+  
+    const postID = $(this).data('post-id');
+    const url = $(this).attr('href');
+  
+    // Send tracking info, then open link
+    $.post('/track-link', {
+      postID: postID,
+      url: url,
+      _csrf: $('meta[name="csrf-token"]').attr('content')
+    }).always(() => {
+      // Open the link in a new tab after tracking attempt
+      window.open(url, '_blank');
+    });
+  });
+  
